@@ -1,6 +1,7 @@
 package com.benshell.pipeline.tree;
 
 import com.benshell.pipeline.linktable.ListNode;
+import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 
 import java.util.*;
 
@@ -17,12 +18,12 @@ public class Learn {
         TreeNode root = new TreeNode(1,secondLeft,secondRight);
 //        List<Integer> result = new ArrayList<>();
 //        preorder2(root,result);
-        List<Integer> result = preorderTraversal(root);
+//        List<Integer> result = preorderTraversal(root);
 //        List<Integer> result = inorderTraversal(root);
 //        List<Integer> result = inorder(root);
-        for(int i = 0; i< result.size(); i ++){
-            System.out.print(result.get(i) + " ");
-        }
+//        for(int i = 0; i< result.size(); i ++){
+//            System.out.print(result.get(i) + " ");
+//        }
 //        List<List<Integer>> result = levelOrder(root);
 //        for(List<Integer> level : result){
 //            for(Integer value: level){
@@ -32,6 +33,7 @@ public class Learn {
 //        }
 //        System.out.println(maxDepth(root));
 //        System.out.println(maxDepth2(root));
+        buildTree(new int[]{1,2,3,4},new int[]{3,2,4,1});
     }
 
     public static List<Integer> preorderTraversal(TreeNode root){
@@ -310,5 +312,86 @@ public class Learn {
             return false;
         }
     }
+
+    public static TreeNode buildTree(int[] inorder, int[] postorder){
+        if(postorder.length == 0){
+            return null;
+        }
+        TreeNode root = new TreeNode(postorder[postorder.length - 1]);
+        Deque<TreeNode> stack = new LinkedList<>();
+        stack.push(root);
+        for(int i = postorder.length - 2; i >= 0; i--){
+            int rootVal = postorder[i];
+            TreeNode node = stack.peek();
+            int nodeIndex = findIndex(inorder,node.val);
+            //[0,nodeIndex - 1] 是左子树 [nodeIndex + 1,inorder.length] 是右子树
+            int rootIndex = findIndex(inorder,rootVal);
+            if(rootIndex>nodeIndex){
+                //是右节点
+                node.right = new TreeNode(rootVal);
+                stack.push(node.right);
+            }
+            else{
+                // node的左节点, 要决定是哪个节点的左节点
+                while(!stack.isEmpty() && stack.peek().val != node.val){
+                    node = stack.pop();
+                }
+                node.left = new TreeNode(rootVal);
+                stack.push(node.left);
+            }
+        }
+        return root;
+    }
+
+    public static int findIndex(int[] inorder,int val){
+        for(int i = 0; i<inorder.length; i++){
+            if(val == inorder[i]){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    public static TreeNode buildTree2(int[] inorder, int[] postorder){
+        if(null == inorder || inorder.length == 0 || null == postorder || 0 == postorder.length){
+            return null;
+        }
+        TreeNode root = buildTree(inorder,0,inorder.length - 1,postorder, 0,postorder.length - 1);
+        return  root;
+    }
+
+    public static TreeNode buildTree(int[] inorder,int start,int end,int[] postorder, int ps,int pe){
+        if(end < start || pe < ps){
+            return null;
+        }
+        int rootVal = postorder[pe];
+        TreeNode root = new TreeNode(rootVal);
+        int rootIndex  = findIndex(inorder,rootVal);
+        root.left = buildTree(inorder,start,rootIndex - 1,postorder,ps, ps + rootIndex - 1 - start);
+        root.right = buildTree(inorder,rootIndex + 1,end,postorder,ps + rootIndex - start, pe - 1);
+        return root;
+    }
+
+    public static TreeNode generateTree(int[] preorder,int[] inorder){
+        if(null == preorder || preorder.length == 0 || null == inorder || 0 == inorder.length){
+            return null;
+        }
+        TreeNode root = buildTrees(preorder,0,preorder.length - 1, inorder, 0, inorder.length);
+        return root;
+    }
+
+    public static TreeNode buildTrees(int[] preorder,int ps,int pe,int[] inorder,int is,int ie){
+        if(pe < ps || ie < is){
+            return null;
+        }
+        int rootVal = preorder[ps];
+        TreeNode root = new TreeNode(rootVal);
+        int rootIndex = findIndex(inorder,rootVal);
+        root.left = buildTrees(preorder,ps + 1,ps + rootIndex - is,inorder,is,rootIndex - 1);
+        root.right = buildTree(preorder,ps + rootIndex - is + 1,pe, inorder, rootIndex + 1,pe);
+        return root;
+    }
+
 }
 
