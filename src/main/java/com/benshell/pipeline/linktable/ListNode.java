@@ -2,9 +2,9 @@ package com.benshell.pipeline.linktable;
 
 public class ListNode {
 
-    int val;
+    public int val;
 
-    ListNode next;
+    public ListNode next;
 
     public ListNode(){
 

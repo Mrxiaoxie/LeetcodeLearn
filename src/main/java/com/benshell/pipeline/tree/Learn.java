@@ -393,5 +393,56 @@ public class Learn {
         return root;
     }
 
+    public static Node connect(Node root){
+        if(null == root){
+            return null;
+        }
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            int size = queue.size();
+            int count = 1;
+            Node first = queue.poll();
+            if(null != first.left){
+                queue.add(first.left);
+            }
+            if(null != first.right){
+                queue.add(first.right);
+            }
+            while(count < size){
+                Node node = queue.poll();
+                if(null != node.left){
+                    queue.add(node.left);
+                }
+                if(null != node.right){
+                    queue.add(node.right);
+                }
+                first.next = node;
+                first = node;
+                count++;
+            }
+        }
+        return root;
+    }
+
+    public static Node connect2(Node root){
+        if(null == root){
+            return null;
+        }
+        Node pre = root;
+        while(null != pre.left){
+            Node head = pre;
+            while(null != head){
+                head.left = head.right;
+                if(null != head.next){
+                    head.right.next = head.next.left;
+                }
+                head = head.next;
+            }
+            pre = pre.left;
+        }
+        return root;
+    }
+
 }
 
